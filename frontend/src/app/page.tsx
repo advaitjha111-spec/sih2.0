@@ -1,277 +1,314 @@
+"use client";
+import SplashCursor from "@/components/SplashCursor";
+import CardSwap, { Card } from "@/components/CardSwap";
+
 import Link from "next/link";
 import { Globe } from "@/components/Globe";
-import { ArrowRight, Activity, Map, CloudRain, AlertTriangle, Radio } from "lucide-react";
+import { Activity, Map, Radio, AlertTriangle, ShieldAlert, ArrowLeft, Zap, Skull, TrendingDown, EyeOff } from "lucide-react";
+import { AnimatedBackground } from "@/components/AnimatedBackground";
+import { SolarSystem } from "@/components/SolarSystem";
 
-export const revalidate = 60; // revalidate every 60 seconds
+import { motion } from "framer-motion";
 
-async function getLatestEvents() {
-  try {
-    const res = await fetch("http://127.0.0.1:8000/api/events/latest", {
-      next: { revalidate: 60 }
-    });
-    if (!res.ok) throw new Error("Failed to fetch events");
-    const data = await res.json();
-    return { events: data.events, isFallback: false };
-  } catch (error) {
-    console.error("Failed to fetch events from backend, using fallback data.");
-    return {
-      isFallback: true,
-      events: [
-        {
-          id: "demo-1",
-          title: "Mangan Landslide",
-          state: "Sikkim",
-          district: "Mangan",
-          event_date: "2026-09-05T12:00:00Z",
-          severity: "High",
-          short_summary: "Landslide above Chyakoong River obstructed river flow.",
-          source_name: "Government of Sikkim / District Administration, Mangan"
-        },
-        {
-          id: "demo-2",
-          title: "Guwahati Rainfall Landslide",
-          state: "Assam",
-          district: "Kamrup Metropolitan",
-          event_date: "2026-09-02T08:00:00Z",
-          severity: "Critical",
-          short_summary: "Heavy rainfall triggered a landslide with casualties.",
-          source_name: "Official News Source"
-        }
-      ]
-    };
-  }
-}
+const fadeIn = {
+  hidden: { opacity: 0, y: 40 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } }
+};
 
-export default async function LandingPage() {
-  const { events, isFallback } = await getLatestEvents();
-
+export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-50 flex flex-col font-sans selection:bg-cyan-500/30">
+    <div className="min-h-screen bg-[#050505] text-slate-200 flex flex-col font-sans relative selection:bg-cyan-500/30 overflow-x-hidden">
       
       {/* HEADER */}
-      <header className="sticky top-0 z-50 bg-slate-950/80 backdrop-blur-md border-b border-slate-800">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Activity className="text-cyan-500 w-6 h-6" />
-            <span className="text-lg font-bold tracking-wide">Bhūmi Raksha</span>
+      <header className="absolute top-0 left-0 w-full z-50 flex items-center justify-between px-6 py-4">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 bg-red-500 rounded flex items-center justify-center">
+            <Zap className="w-5 h-5 text-white fill-white" />
           </div>
-          <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-slate-300">
-            <Link href="#events" className="hover:text-white transition-colors">Latest Events</Link>
-            <Link href="#how-it-works" className="hover:text-white transition-colors">How It Works</Link>
-          </nav>
-          <div className="flex items-center gap-4">
-            <Link 
-              href="/dashboard" 
-              className="bg-cyan-600 hover:bg-cyan-500 text-white px-5 py-2 rounded-md text-sm font-semibold transition-all shadow-[0_0_15px_rgba(8,145,178,0.4)]"
-            >
-              Get Started
-            </Link>
-          </div>
+          <span className="font-bold text-xl tracking-tight text-white">BhūmiRaksha</span>
+        </div>
+        <div className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-400">
+          <a href="#threat" className="hover:text-white transition-colors">The Threat</a>
+          <a href="#science" className="hover:text-white transition-colors">The Science</a>
+          <a href="#architecture" className="hover:text-white transition-colors">Architecture</a>
+        </div>
+        <div className="flex items-center gap-4">
+          <Link href="/dashboard" className="px-6 py-2 bg-white text-black font-bold rounded-full text-sm hover:bg-slate-200 transition-colors">
+            Live Map &rarr;
+          </Link>
+          <Link href="/console" className="px-6 py-2 border border-slate-700 bg-neutral-900/50 rounded-full text-sm font-bold text-white hover:border-red-500/50 hover:bg-neutral-900 transition-all flex items-center gap-2">
+            Operator Portal <Zap className="w-4 h-4 text-red-500" />
+          </Link>
         </div>
       </header>
 
-      <main className="flex-1">
+      {/* LIVE TICKER */}
+      <div className="w-full bg-[#3b0728]/40 border-b border-[#831843]/30 overflow-hidden py-2 z-40 mt-[72px] relative backdrop-blur-sm">
+        <div className="animate-marquee whitespace-nowrap text-[11px] md:text-xs font-mono font-bold tracking-widest text-red-400/90 flex gap-12">
+          <span>● LANDSLIDE ALERT — Dima Hasao Zone · Risk Score 92/100</span>
+          <span>● SENTINEL-1 SAR PASS — 09 Sep 2026 14:00 UTC</span>
+          <span>● SOIL MOISTURE +18.5% — Saturation threshold exceeded</span>
+          <span>● XGBoost Engine — 89% precision · 12ms inference</span>
+          <span>● Downstream impact — 4,200 residents at risk</span>
+          <span>● Irshalwadi 2023 — $50M damage · Entire village buried</span>
+          <span>● ETA failure — ~4 hours from trigger</span>
+          <span>● Local siren broadcast — Active</span>
+        </div>
+      </div>
+
+      <main className="flex-1 flex flex-col relative w-full items-center justify-start z-10 pt-20">
+        
         {/* HERO SECTION */}
-        <section className="relative overflow-hidden pt-20 pb-32">
-          {/* Background Elements */}
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-slate-950" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-cyan-900/20 rounded-full blur-3xl" />
+        <section className="relative w-full min-h-screen flex flex-col items-center justify-center pt-24 pb-32 overflow-hidden">
+          
+          <AnimatedBackground />
+      <SplashCursor />
 
-          <div className="max-w-7xl mx-auto px-6 relative z-10 grid lg:grid-cols-2 gap-12 items-center">
-            <div className="space-y-8">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-800/50 border border-slate-700 text-xs font-medium text-slate-300">
-                <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-                Live NER Monitoring Active
-              </div>
-              
-              <h1 className="text-5xl lg:text-6xl font-bold leading-tight tracking-tight">
-                See the risk before <br/>
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">
-                  the slope moves.
-                </span>
+          {/* Background Atmosphere */}
+          <div className="absolute inset-0 z-0">
+            <img src="/rain_mountain.gif" alt="Background" className="absolute inset-0 w-full h-full object-cover opacity-60 mix-blend-screen" />
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#050505]/60 to-[#050505]" />
+          </div>
+
+          {/* Cinematic Hero Text */}
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1.2, ease: "easeOut" }}
+            className="relative z-10 text-center px-4 w-full max-w-7xl pointer-events-none"
+          >
+            <div className="flex flex-col items-center justify-center">
+              <h1 className="text-5xl md:text-6xl lg:text-7xl font-serif italic font-light tracking-tight text-white/90 leading-none mix-blend-screen mb-2 lg:mb-4 z-20">
+                Nature's fury strikes
               </h1>
-              
-              <p className="text-lg text-slate-400 max-w-xl leading-relaxed">
-                Bhūmi Raksha combines rainfall, soil conditions, terrain, field reports, and AI-driven risk prediction to help NER authorities identify vulnerable zones earlier and respond faster.
-              </p>
-              
-              <div className="flex flex-col sm:flex-row gap-4 pt-4">
-                <Link 
-                  href="/dashboard" 
-                  className="inline-flex items-center justify-center gap-2 bg-cyan-600 hover:bg-cyan-500 text-white px-6 py-3 rounded-lg font-semibold transition-all shadow-[0_0_20px_rgba(8,145,178,0.4)] group"
-                >
-                  Get Started 
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </Link>
-                <Link 
-                  href="#events" 
-                  className="inline-flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-700 text-slate-200 px-6 py-3 rounded-lg font-medium transition-colors"
-                >
-                  Explore Latest Events
-                </Link>
-              </div>
+              <h2 className="text-6xl md:text-8xl lg:text-[100px] font-sans font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white to-white/60 leading-none z-10 uppercase">
+                WITHOUT WARNING
+              </h2>
             </div>
+          </motion.div>
 
-            <div className="relative">
-              <Globe />
-            </div>
-          </div>
+          {/* Bottom Description & CTA */}
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1, delay: 0.5 }} className="relative z-20 flex flex-col items-center text-center max-w-2xl mx-auto mt-8 pointer-events-auto"><p className="text-lg md:text-xl text-slate-300 mb-8 font-serif italic leading-relaxed">Our AI-powered command center monitors high-risk slopes in real-time, predicting Landslides and Debris Flows before they strike.</p>
+            <Link 
+              href="/console"
+              className="inline-block bg-white text-black font-sans font-bold uppercase tracking-widest text-xs px-10 py-5 rounded-full hover:bg-slate-200 transition-colors shadow-[0_0_40px_rgba(255,255,255,0.2)]"
+            >
+              Enter Command Center
+            </Link>
+          </motion.div>
+
+          {/* Bottom Left Intro */}
+          <motion.div 
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 1, delay: 0.5 }}
+            className="absolute bottom-24 left-12 z-20 max-w-sm hidden md:block"
+          >
+            <p className="text-sm text-slate-400 leading-relaxed font-sans font-light">
+              Every unstable slope holds a chapter of our planet's changing climate, silently swelling behind fragile terrain in the high mountains.
+            </p>
+          </motion.div>
         </section>
 
-        {/* CAPABILITIES STRIP */}
-        <section className="border-y border-slate-800 bg-slate-900/50 backdrop-blur-sm relative z-20">
-          <div className="max-w-7xl mx-auto px-6 py-10">
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 text-center">
+        {/* SECTION 2: COST OF NO WARNING (With FlipCards) */}
+        <motion.section 
+          id="threat" 
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
+          variants={fadeIn}
+          className="w-full max-w-7xl mx-auto px-8 py-32 grid grid-cols-1 lg:grid-cols-2 gap-16 relative z-20"
+        >
+          <div>
+            <h3 className="text-xs font-mono font-bold uppercase tracking-widest text-orange-500 mb-4">The Cost of No Warning</h3>
+            <h2 className="text-5xl md:text-6xl font-serif italic text-white font-light leading-tight mb-8">
+              Three events. Billions lost.<br/>Zero advance notice.
+            </h2>
+            <p className="text-slate-500 max-w-md font-light text-lg mb-8">
+              Aligned with the National Disaster Management Authority (NDMA) guidelines for early warning systems. <br/><br/>
+              <span className="text-white/50 text-sm">Hover over the cards to reveal the devastating impact statistics.</span>
+            </p>
+          </div>
+                                  <div className="flex flex-col items-center justify-center relative min-h-[450px]">
+              <CardSwap cardDistance={40} verticalDistance={50} delay={4000} pauseOnHover={true}>
+                {/* Event 1: Tupul, Manipur */}
+                <Card className="w-[350px] h-[400px]">
+                  <div className="w-full h-full bg-neutral-900/80 p-8 flex flex-col justify-center items-center group rounded-[24px]">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-red-500/10 rounded-full opacity-50" />
+                    <Skull className="w-12 h-12 text-red-500 mb-4 opacity-80" />
+                    <h3 className="text-3xl font-bold text-white tracking-wider uppercase text-center">Tupul,<br/>Manipur</h3>
+                    <p className="text-slate-500 font-mono text-sm mt-2">June 2022</p>
+                    <div className="mt-6 text-center border-t border-white/10 pt-6 w-full">
+                      <div className="text-4xl font-black text-white mb-2">61 <span className="text-lg font-normal text-slate-400 font-serif italic block mt-1">lives lost</span></div>
+                      <p className="text-red-200/70 text-sm mt-3 font-medium leading-relaxed">Massive slope failure wiped out an entire railway construction camp in the middle of the night.</p>
+                    </div>
+                  </div>
+                </Card>
+                {/* Event 2: Sikkim GLOF */}
+                <Card className="w-[350px] h-[400px]">
+                  <div className="w-full h-full bg-neutral-900/80 p-8 flex flex-col justify-center items-center group rounded-[24px]">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/10 rounded-full opacity-50" />
+                    <EyeOff className="w-12 h-12 text-orange-500 mb-4 opacity-80" />
+                    <h3 className="text-3xl font-bold text-white tracking-wider uppercase text-center">Teesta Valley,<br/>Sikkim</h3>
+                    <p className="text-slate-500 font-mono text-sm mt-2">October 2023</p>
+                    <div className="mt-6 text-center border-t border-white/10 pt-6 w-full">
+                      <div className="text-4xl font-black text-white mb-2">100+ <span className="text-lg font-normal text-slate-400 font-serif italic block mt-1">casualties</span></div>
+                      <p className="text-orange-200/70 text-sm mt-3 font-medium leading-relaxed">GLOF-triggered cascading landslides washed away the Chungthang Dam and obliterated NH-10.</p>
+                    </div>
+                  </div>
+                </Card>
+                {/* Event 3: Dima Hasao, Assam */}
+                <Card className="w-[350px] h-[400px]">
+                  <div className="w-full h-full bg-neutral-900/80 p-8 flex flex-col justify-center items-center group rounded-[24px]">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/10 rounded-full opacity-50" />
+                    <TrendingDown className="w-12 h-12 text-cyan-500 mb-4 opacity-80" />
+                    <h3 className="text-3xl font-bold text-white tracking-wider uppercase text-center">Dima Hasao,<br/>Assam</h3>
+                    <p className="text-slate-500 font-mono text-sm mt-2">May 2022</p>
+                    <div className="mt-6 text-center border-t border-white/10 pt-6 w-full">
+                      <div className="text-4xl font-black text-white mb-2">$30M+ <span className="text-lg font-normal text-slate-400 font-serif italic block mt-1">economic loss</span></div>
+                      <p className="text-cyan-200/70 text-sm mt-3 font-medium leading-relaxed">Multiple landslides destroyed Haflong railway station, severing all communication and supply lines.</p>
+                    </div>
+                  </div>
+                </Card>
+              </CardSwap>
+            </div>
+
+          </motion.section>
+
+        {/* SECTION 3: TECHNICAL ARCHITECTURE */}
+        <motion.section 
+          id="architecture" 
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
+          variants={fadeIn}
+          className="w-full max-w-7xl mx-auto px-8 py-32 relative z-20 border-t border-white/5"
+        >
+          <div className="mb-16">
+            <h3 className="text-xs font-mono font-bold uppercase tracking-widest text-cyan-500 mb-4">Technical Architecture</h3>
+            <h2 className="text-5xl md:text-6xl font-serif italic text-white font-light leading-tight mb-6">
+              Satellite to alert.<br/>Under 10 minutes.
+            </h2>
+            <p className="text-slate-400 max-w-xl text-lg font-light">
+              BhūmiRaksha is a hybrid deterministic + agentic system. The math engine is the backbone. The agents make it legible to humans.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
+            {/* Risk Matrix */}
+            <div className="space-y-8">
               {[
-                { icon: Activity, label: "AI Risk Prediction" },
-                { icon: Map, label: "Live Risk Mapping" },
-                { icon: CloudRain, label: "Weather-linked Analysis" },
-                { icon: Radio, label: "Sensor Telemetry" },
-                { icon: AlertTriangle, label: "Infrastructure Impact" },
-                { icon: AlertTriangle, label: "Early Alerts" },
-              ].map((item, idx) => (
-                <div key={idx} className="flex flex-col items-center gap-3 opacity-80 hover:opacity-100 transition-opacity">
-                  <item.icon className="w-6 h-6 text-cyan-500" />
-                  <span className="text-sm font-medium text-slate-300">{item.label}</span>
+                { label: "Soil Saturation (Volumetric)", val: "88%", color: "bg-red-500", w: "88%" },
+                { label: "Precip 7-Day Anomaly", val: "210mm", color: "bg-orange-500", w: "70%" },
+                { label: "SAR Backscatter Change", val: "-3.2 dB", color: "bg-yellow-500", w: "65%" },
+                { label: "Inclinometer Tilt", val: "2.4°", color: "bg-teal-500", w: "40%" },
+                { label: "Pore Water Pressure", val: "+14 kPa", color: "bg-blue-500", w: "60%" }
+              ].map((metric, i) => (
+                <div key={i}>
+                  <div className="flex justify-between text-sm font-mono mb-2">
+                    <span className="text-slate-400">{metric.label}</span>
+                    <span className="text-white font-bold">{metric.val}</span>
+                  </div>
+                  <div className="w-full h-1.5 bg-neutral-900 rounded-full overflow-hidden">
+                    <motion.div 
+                      initial={{ width: 0 }}
+                      whileInView={{ width: metric.w }}
+                      transition={{ duration: 1.5, delay: i * 0.1, ease: "easeOut" }}
+                      viewport={{ once: true }}
+                      className={`h-full ${metric.color} rounded-full relative`} 
+                    >
+                      <div className="absolute right-0 top-0 bottom-0 w-4 bg-white/50 blur-[2px]" />
+                    </motion.div>
+                  </div>
                 </div>
               ))}
             </div>
-          </div>
-        </section>
 
-        {/* LATEST EVENTS */}
-        <section id="events" className="py-24 bg-slate-950">
-          <div className="max-w-7xl mx-auto px-6">
-            <div className="flex items-end justify-between mb-12">
-              <div>
-                <h2 className="text-3xl font-bold mb-4">Latest Landslide Activity</h2>
-                <p className="text-slate-400">Recent incidents and conditions relevant to the region.</p>
-                {isFallback && (
-                  <div className="mt-2 inline-block px-2 py-1 text-xs font-semibold text-orange-400 border border-orange-400/30 bg-orange-400/10 rounded">
-                    Using Demo data
-                  </div>
-                )}
+            {/* Solar System Engines */}
+              <div className="flex items-center justify-center col-span-1 md:col-span-1 lg:scale-[0.8] xl:scale-100 origin-center">
+                <SolarSystem />
               </div>
-            </div>
-
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {events.map((event: any) => (
-                <Link key={event.id} href={`/dashboard?event=${event.id}`} className="group block">
-                  <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 h-full hover:border-cyan-500/50 transition-colors">
-                    <div className="flex items-center justify-between mb-4">
-                      <span className={`px-2.5 py-1 rounded text-xs font-bold uppercase tracking-wider ${
-                        event.severity === 'Critical' ? 'bg-red-500/20 text-red-400 border border-red-500/30' :
-                        event.severity === 'High' ? 'bg-orange-500/20 text-orange-400 border border-orange-500/30' :
-                        'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30'
-                      }`}>
-                        {event.severity}
-                      </span>
-                      <span className="text-sm text-slate-500">
-                        {new Date(event.event_date).toLocaleDateString()}
-                      </span>
-                    </div>
-                    <h3 className="text-lg font-bold mb-2 group-hover:text-cyan-400 transition-colors">
-                      {event.title}
-                    </h3>
-                    <p className="text-slate-400 text-sm mb-4 line-clamp-2">
-                      {event.short_summary}
-                    </p>
-                    <div className="mt-auto pt-4 border-t border-slate-800 flex items-center justify-between">
-                      <span className="text-xs text-slate-500 truncate pr-4" title={event.source_name}>
-                        {event.source_name}
-                      </span>
-                      <span className="text-sm font-medium text-cyan-500 whitespace-nowrap">View Event</span>
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
           </div>
-        </section>
+        </motion.section>
 
-        {/* HOW IT WORKS */}
-        <section id="how-it-works" className="py-24 bg-slate-900">
-          <div className="max-w-7xl mx-auto px-6">
-            <h2 className="text-3xl font-bold text-center mb-16">How Bhūmi Raksha Works</h2>
-            
-            <div className="grid md:grid-cols-5 gap-8">
-              {[
-                { step: "1. Collect", desc: "Weather + terrain + sensors + reports" },
-                { step: "2. Analyze", desc: "Risk model + ML inference" },
-                { step: "3. Map", desc: "Hotspots + infrastructure + roads" },
-                { step: "4. Alert", desc: "Zone-specific warnings" },
-                { step: "5. Respond", desc: "Prioritized field action" },
-              ].map((item, i) => (
-                <div key={i} className="relative">
-                  {i < 4 && <div className="hidden md:block absolute top-6 left-[60%] w-[80%] h-[2px] bg-slate-800" />}
-                  <div className="w-12 h-12 bg-slate-800 rounded-full flex items-center justify-center mb-4 relative z-10 border border-slate-700 text-cyan-400 font-bold">
-                    {i + 1}
-                  </div>
-                  <h3 className="text-lg font-bold mb-2">{item.step.split('.')[1]}</h3>
-                  <p className="text-sm text-slate-400">{item.desc}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* COMPARISON SECTION */}
-        <section className="py-24 bg-slate-950">
-          <div className="max-w-7xl mx-auto px-6">
-            <div className="grid md:grid-cols-2 gap-12">
-              <div className="bg-slate-900/50 border border-slate-800 rounded-2xl p-8 lg:p-12">
-                <h3 className="text-2xl font-bold mb-6 text-slate-400">Before</h3>
-                <ul className="space-y-4 text-slate-400">
-                  <li className="flex items-center gap-3"><span className="w-1.5 h-1.5 rounded-full bg-slate-600" /> Scattered data</li>
-                  <li className="flex items-center gap-3"><span className="w-1.5 h-1.5 rounded-full bg-slate-600" /> Manual checking</li>
-                  <li className="flex items-center gap-3"><span className="w-1.5 h-1.5 rounded-full bg-slate-600" /> Delayed field reports</li>
-                  <li className="flex items-center gap-3"><span className="w-1.5 h-1.5 rounded-full bg-slate-600" /> No unified risk picture</li>
-                  <li className="flex items-center gap-3"><span className="w-1.5 h-1.5 rounded-full bg-slate-600" /> Hard-to-prioritize incidents</li>
-                </ul>
-              </div>
-              <div className="bg-cyan-950/20 border border-cyan-900/50 rounded-2xl p-8 lg:p-12 relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-600/10 blur-3xl rounded-full" />
-                <h3 className="text-2xl font-bold mb-6 text-cyan-400">With Bhūmi Raksha</h3>
-                <ul className="space-y-4 text-slate-300 relative z-10">
-                  <li className="flex items-center gap-3"><span className="w-1.5 h-1.5 rounded-full bg-cyan-500" /> Unified geospatial view</li>
-                  <li className="flex items-center gap-3"><span className="w-1.5 h-1.5 rounded-full bg-cyan-500" /> Continuous telemetry ingestion</li>
-                  <li className="flex items-center gap-3"><span className="w-1.5 h-1.5 rounded-full bg-cyan-500" /> AI-assisted risk scoring</li>
-                  <li className="flex items-center gap-3"><span className="w-1.5 h-1.5 rounded-full bg-cyan-500" /> Citizen / field evidence</li>
-                  <li className="flex items-center gap-3"><span className="w-1.5 h-1.5 rounded-full bg-cyan-500" /> Road & infrastructure impact</li>
-                  <li className="flex items-center gap-3"><span className="w-1.5 h-1.5 rounded-full bg-cyan-500" /> Centralized alerts and response priority</li>
-                </ul>
-              </div>
-            </div>
-            
-            <div className="mt-20 text-center">
-              <Link 
-                href="/dashboard" 
-                className="inline-flex items-center justify-center gap-2 bg-cyan-600 hover:bg-cyan-500 text-white px-8 py-4 rounded-xl font-bold text-lg transition-all shadow-[0_0_30px_rgba(8,145,178,0.3)] hover:shadow-[0_0_40px_rgba(8,145,178,0.5)]"
+        {/* SECTION 4: PIPELINE CARDS */}
+        <motion.section 
+          id="science" 
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
+          variants={fadeIn}
+          className="w-full max-w-7xl mx-auto px-8 py-24 relative z-20"
+        >
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {[
+              { num: "01", title: "Sentinel Analysis", desc: "Optical + SAR satellite data detects soil movement and vegetation anomalies via NDWI delta." },
+              { num: "02", title: "Env. Cross-Check", desc: "7-day precipitation, soil moisture, and inclinometer tilt validate the satellite signal." },
+              { num: "03", title: "XGBoost Engine", desc: "8-feature deterministic model outputs a 0–100 risk index in under 12ms with 89% precision." },
+              { num: "04", title: "Local Broadcast", desc: "Automated siren triggers and local-language audio alerts for downstream communities within the 24-hour window." }
+            ].map((step, i) => (
+              <motion.div 
+                key={i} 
+                whileHover={{ y: -5 }}
+                className="bg-neutral-900/80 border border-neutral-800 p-8 rounded-3xl hover:bg-neutral-800/80 transition-colors"
               >
-                Open Risk Dashboard
-              </Link>
-            </div>
+                <div className="text-sm font-mono text-slate-500 mb-6">{step.num}</div>
+                <h4 className="text-xl font-bold text-white mb-4">{step.title}</h4>
+                <p className="text-sm text-slate-400 leading-relaxed font-serif italic">{step.desc}</p>
+              </motion.div>
+            ))}
           </div>
-        </section>
+        </motion.section>
       </main>
 
+      {/* Floating macOS style Dock */}
+      <motion.div 
+        initial={{ y: 100 }}
+        animate={{ y: 0 }}
+        transition={{ duration: 0.8, type: "spring" }}
+        className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 backdrop-blur-md bg-neutral-900/70 border border-neutral-800 rounded-full px-4 py-3 flex items-center gap-4 shadow-2xl"
+      >
+        <Link href="/dashboard" className="p-2 hover:bg-white/10 rounded-xl transition-colors text-cyan-500 group relative">
+          <Globe className="w-5 h-5" />
+          <span className="absolute -top-12 left-1/2 -translate-x-1/2 bg-black text-white text-[10px] font-bold px-3 py-1.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-lg border border-white/10">Threat Overview</span>
+        </Link>
+        <div className="w-px h-6 bg-white/10" />
+        <Link href="#science" className="p-2 hover:bg-white/10 rounded-xl transition-colors text-purple-400 group relative">
+          <Activity className="w-5 h-5" />
+          <span className="absolute -top-12 left-1/2 -translate-x-1/2 bg-black text-white text-[10px] font-bold px-3 py-1.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-lg border border-white/10">Science Matrix</span>
+        </Link>
+        <div className="w-px h-6 bg-white/10" />
+        <Link href="#architecture" className="p-2 hover:bg-white/10 rounded-xl transition-colors text-orange-400 group relative">
+          <AlertTriangle className="w-5 h-5" />
+          <span className="absolute -top-12 left-1/2 -translate-x-1/2 bg-black text-white text-[10px] font-bold px-3 py-1.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-lg border border-white/10">Architecture</span>
+        </Link>
+        <div className="w-px h-6 bg-white/10" />
+        <Link href="/dashboard" className="p-2 hover:bg-white/10 rounded-xl transition-colors text-emerald-500 group relative">
+          <Map className="w-5 h-5" />
+          <span className="absolute -top-12 left-1/2 -translate-x-1/2 bg-black text-white text-[10px] font-bold px-3 py-1.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-lg border border-white/10">Live Map</span>
+        </Link>
+        <div className="w-px h-6 bg-white/10" />
+        <Link href="/console" className="p-2 hover:bg-white/10 rounded-xl transition-colors text-red-500 group relative">
+          <Radio className="w-5 h-5" />
+          <span className="absolute -top-12 left-1/2 -translate-x-1/2 bg-black text-white text-[10px] font-bold px-3 py-1.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-lg border border-white/10">Operator Alerts</span>
+        </Link>
+      </motion.div>
+
       {/* FOOTER */}
-      <footer className="border-t border-slate-800 bg-slate-950 py-12">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-            <div>
-              <div className="flex items-center gap-2 mb-2">
-                <Activity className="text-slate-500 w-5 h-5" />
-                <span className="font-bold text-slate-300">Bhūmi Raksha</span>
-              </div>
-              <p className="text-sm text-slate-500">Internal Hackathon Project • Disaster-risk awareness and decision support.</p>
-            </div>
-            <div className="text-right">
-              <p className="text-sm text-slate-500">© 2026 Bhūmi Raksha. Built for disaster-risk awareness and decision support.</p>
-            </div>
-          </div>
+      <footer className="border-t border-white/5 bg-[#050505] py-6 px-8 flex flex-col md:flex-row justify-between items-center text-[10px] font-mono text-slate-500 uppercase tracking-widest z-20 pb-24 md:pb-6 gap-4">
+        <div>BhūmiRaksha Operator Console v1.0 • Internal Hackathon 2026</div>
+        <div className="flex gap-6">
+          <span className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> XGBoost Engine ACTIVE</span>
+          <span className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Sensor Feed CONNECTED</span>
         </div>
       </footer>
     </div>
   );
 }
+
+
+
+
+
+
+

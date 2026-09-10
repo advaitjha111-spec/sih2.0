@@ -1,26 +1,80 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-sans: var(--font-inter);
+  --font-serif: var(--font-playfair);
+  --font-mono: var(--font-mono);
+  
+  --color-brand-bg: #070a0f;
+  --color-brand-surface: rgba(18, 24, 38, 0.7);
+  --color-brand-border: rgba(255, 255, 255, 0.08);
+  
+  --color-brand-danger: #ef4444;
+  --color-brand-cyan: #06b6d4;
+  --color-brand-success: #10b981;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-brand-bg);
+  color: #f1f5f9;
+  font-family: var(--font-sans);
+}
+
+.glass-panel {
+  background-color: var(--color-brand-surface);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--color-brand-border);
+}
+
+/* Custom minimal scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.animate-marquee {
+  animation: marquee 30s linear infinite;
+}
+
+@keyframes fill-dial {
+  0% { stroke-dashoffset: 125.66; }
+  100% { stroke-dashoffset: var(--target-offset); }
+}
+
+.animate-dial {
+  stroke-dasharray: 125.66;
+  stroke-dashoffset: 125.66;
+  animation: fill-dial 2.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  /* Add a slight delay for dramatic effect */
+  animation-delay: 0.2s;
+}
+@layer utilities {
+  .perspective-1000 {
+    perspective: 1000px;
+  }
+  .preserve-3d {
+    transform-style: preserve-3d;
+  }
+  .backface-hidden {
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+  .rotate-y-180 {
+    transform: rotateY(180deg);
+  }
 }

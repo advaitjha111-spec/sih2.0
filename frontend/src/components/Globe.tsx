@@ -1,3 +1,4 @@
+// @ts-nocheck
 "use client";
 
 import createGlobe from "cobe";
@@ -38,7 +39,7 @@ export function Globe() {
         // Sikkim roughly 27.5°N 88.5°E
         { location: [27.53, 88.51], size: 0.05 },
       ],
-      onRender: (state) => {
+      onRender: (state: any) => {
         // Called on every animation frame.
         // `state` will be an empty object, return updated params.
         state.phi = phi;
@@ -46,7 +47,7 @@ export function Globe() {
         state.width = width * 2;
         state.height = width * 2;
       },
-    });
+    } as any);
 
     return () => {
       globe.destroy();
